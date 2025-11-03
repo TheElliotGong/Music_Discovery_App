@@ -1,6 +1,7 @@
 import express from 'express'
 import { User } from '../../db/mocks.js';
-import { hash, compare, sign, authenticate } from '../util/auth.js';
+import { hash, compare, sign} from '../util/auth.js';
+import {verifyUser} from '../middleware/authorization.js';
 const router = express.Router();
 //A helper function to remove the password field from user objects before sending them in responses
 const sanitize = (user) => {
@@ -109,7 +110,7 @@ router.post('/login', async (req, res) => {
  * Requires 'Authentication' header with the user ID.
  * Validates that the requested ID matches the authenticated user ID.
  */
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', verifyUser, async (req, res) => {
     try {
         const { id } = req.params;
         // Read the 'Authentication' header in a case-insensitive way

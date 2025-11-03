@@ -1,7 +1,7 @@
 import { verify } from '../util/auth.js';
 import { User } from '../../db/mocks.js';
 
-const authorize = async (req, res, next) => {
+const verifyUser = async (req, res, next) => {
     try {
         const { authorization } = req.headers;
         if (!authorization) {
@@ -29,4 +29,4 @@ const authorize = async (req, res, next) => {
 
 };
 
-export default authorize;
+export {verifyUser};

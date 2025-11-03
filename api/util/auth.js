@@ -46,4 +46,4 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ error: err.message || 'Invalid token' });
   }
 };
-export default { hash, compare, sign, verify, getTokenFromHeader, authenticate };
+export { hash, compare, sign, verify, getTokenFromHeader, authenticate };

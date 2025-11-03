@@ -1,8 +1,5 @@
-const mongoose = require('mongoose');
-const _ = require('underscore');
+import mongoose from 'mongoose';
 
-const setName = (name) => _.escape(name).trim();
-let PlaylistModel = {};
 // Define profile schema
 const trackSchema = new mongoose.Schema({
   track: { type: String, required: true },
@@ -17,7 +14,7 @@ const PlaylistSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    set: setName,
+
   },
   // Store embedded track metadata retrieved from Last.fm
   tracks: {
@@ -56,5 +53,5 @@ PlaylistSchema.statics.authenticate = async (title, callback) => {
   }
 };
 
-PlaylistModel = mongoose.model('Playlist', PlaylistSchema);
-module.exports = PlaylistModel;
+const Playlist = mongoose.model('Playlist', PlaylistSchema);
+export default Playlist;

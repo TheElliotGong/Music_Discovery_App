@@ -1,6 +1,5 @@
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
-
+import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 /* When generating a password hash, bcrypt (and most other password hash
    functions) use a "salt". The salt is simply extra data that gets hashed
    along with the password. The addition of the salt makes it more difficult
@@ -9,11 +8,10 @@ const mongoose = require('mongoose');
 */
 const saltRounds = 10;
 
-let UserModel = {};
 
 /* Our schema defines the data we will store. A username (string of alphanumeric
    characters), a password (actually the hashed version of the password created
-   by bcrypt), and the created date.
+   by bcrypt), the playlists belonging to the player, and the created date.
 */
 const UserSchema = new mongoose.Schema({
   username: {
@@ -28,6 +26,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  playlists: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Playlist',
+    }
+  ],
+
   createdDate: {
     type: Date,
     default: Date.now,
@@ -67,5 +72,5 @@ UserSchema.statics.authenticate = async (username, password, callback) => {
   }
 };
 
-UserModel = mongoose.model('User', UserSchema);
-module.exports = UserModel;
+const User = mongoose.model('User', UserSchema);
+export default User;
