@@ -9,7 +9,7 @@ const trackSchema = new mongoose.Schema({
   image: { type: String, default: '' },
 });
 
-const PlaylistSchema = new mongoose.Schema({
+const playlistSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -29,19 +29,8 @@ const PlaylistSchema = new mongoose.Schema({
   },
 
 });
-PlaylistSchema.virtual('user', {
-  ref: 'User',
-  localField: 'user_id',
-  foreignField: '_id',
-  justOne: true,
-})
-// Hep store profile in redis
-// ProfileSchema.statics.toAPI = (doc) => ({
-//   name: doc.name,
-//   _id: doc._id,
-// });
-// Authenticate profile when needed
-PlaylistSchema.statics.authenticate = async (title, callback) => {
+
+playlistSchema.statics.authenticate = async (title, callback) => {
   try {
     const doc = await PlaylistModel.findOne({ title }).exec();
     if (!doc) {
@@ -53,5 +42,5 @@ PlaylistSchema.statics.authenticate = async (title, callback) => {
   }
 };
 
-const Playlist = mongoose.model('Playlist', PlaylistSchema);
+const Playlist = mongoose.model('Playlist', playlistSchema);
 export default Playlist;

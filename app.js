@@ -4,7 +4,8 @@ import playlists from './api/routes/playlists.js';
 import tracks from './api/routes/tracks.js';
 import users from './api/routes/users.js';
 import mongoose from 'mongoose';
-import User from './api/controllers/models/User.js';
+import User from './api/controllers/models/users.js';
+import Playlist from './api/controllers/models/playlists.js';
 
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;

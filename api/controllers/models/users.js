@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import { use } from 'react';
 /* When generating a password hash, bcrypt (and most other password hash
    functions) use a "salt". The salt is simply extra data that gets hashed
    along with the password. The addition of the salt makes it more difficult
@@ -13,7 +14,7 @@ const saltRounds = 10;
    characters), a password (actually the hashed version of the password created
    by bcrypt), the playlists belonging to the player, and the created date.
 */
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -26,27 +27,23 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  playlists: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Playlist',
-    }
-  ],
 
-  createdDate: {
+  registrationDate: {
     type: Date,
     default: Date.now,
   },
 });
+userSchema.virtual('playlists', {
+  ref: 'Playlist', // The model to use
+  localField: '_id', // field in User
+  foreignField: 'user_id', // field in Playlist that refers to User
+});
 
-// Converts a doc to something we can store in redis later on.
-// UserSchema.statics.toAPI = (doc) => ({
-//   username: doc.username,
-//   _id: doc._id,
-// });
+userSchema.set('toObject', { virtuals: true });
+userSchema.set('toJSON', { virtuals: true });
 
 // Helper function to hash a password
-UserSchema.statics.generateHash = (password) => bcrypt.hash(password, saltRounds);
+userSchema.statics.generateHash = (password) => bcrypt.hash(password, saltRounds);
 
 /* Helper function for authenticating a password against one already in the
    database. Essentially when a user logs in, we need to verify that the password
@@ -55,7 +52,7 @@ UserSchema.statics.generateHash = (password) => bcrypt.hash(password, saltRounds
    and hashed password to bcrypt's compare function. The compare function hashes the
    given password the same number of times as the stored password and compares the result.
 */
-UserSchema.statics.authenticate = async (username, password, callback) => {
+userSchema.statics.authenticate = async (username, password, callback) => {
   try {
     const doc = await UserModel.findOne({ username }).exec();
     if (!doc) {
@@ -72,5 +69,5 @@ UserSchema.statics.authenticate = async (username, password, callback) => {
   }
 };
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', userSchema);
 export default User;
