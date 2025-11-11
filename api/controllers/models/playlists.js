@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Define profile schema
+//Define track schema(this won't be a model, just embedded in playlist)
 const trackSchema = new mongoose.Schema({
   track: { type: String, required: true },
   artist: { type: String, required: true },
@@ -8,24 +8,22 @@ const trackSchema = new mongoose.Schema({
   mbid: { type: String, required: true, index: true },
   image: { type: String, default: '' },
 });
-
+//Define playlist schema
 const playlistSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
     trim: true,
-
   },
-  // Store embedded track metadata retrieved from Last.fm
+  // Store embedded track subdocuments
   tracks: {
     type: [trackSchema],
-    required: true,
     default: []
   },
   user_id: {
     type: mongoose.Schema.ObjectId,
-    required: true,
     ref: 'User',
+    
   },
 
 });

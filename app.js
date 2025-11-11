@@ -31,7 +31,7 @@ const runScript = async () => {
         await connect();
         const newUser = new User({
             username: 'newuser',
-            email: 'newuser@example.com',
+          
             password: 'password123'
         });
         await newUser.save();

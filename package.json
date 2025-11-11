@@ -2,10 +2,10 @@
   "name": "music-playlister",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "script.js",
   "type": "module",
   "scripts": {
-    "dev": "npx nodemon app.js"
+    "dev": "npx nodemon script.js"
   },
   "keywords": [],
   "author": "Elliot Gong",

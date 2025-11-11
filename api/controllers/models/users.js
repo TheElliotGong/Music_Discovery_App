@@ -33,14 +33,28 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+//Enable virtual field for user's playlists
 userSchema.virtual('playlists', {
   ref: 'Playlist', // The model to use
   localField: '_id', // field in User
   foreignField: 'user_id', // field in Playlist that refers to User
 });
-
-userSchema.set('toObject', { virtuals: true });
-userSchema.set('toJSON', { virtuals: true });
+// Ensure virtual fields are serialised and prevent password from being printed
+userSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    delete ret.password;
+    return ret;
+  }
+});
+userSchema.set('toObject', {
+  virtuals: true,
+  transform: (doc, ret) => {
+    delete ret.password;
+    return ret;
+  }
+});
 
 // Helper function to hash a password
 userSchema.statics.generateHash = (password) => bcrypt.hash(password, saltRounds);
