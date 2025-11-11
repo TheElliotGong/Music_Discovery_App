@@ -8,10 +8,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_URL = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 
-const sanitize = (user) => {
-    const { password, ...rest } = user;
-    return rest;
-};
+
 /**
  * connect to mongoDB
  * constructs the mongo URI and connects using mongoose

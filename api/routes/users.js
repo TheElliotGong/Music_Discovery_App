@@ -2,6 +2,7 @@ import express from 'express'
 import { User } from '../../db/mocks.js';
 import { hash, compare, sign} from '../util/auth.js';
 import {verifyUser} from '../middleware/authorization.js';
+
 const router = express.Router();
 //A helper function to remove the password field from user objects before sending them in responses
 const sanitize = (user) => {

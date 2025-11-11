@@ -5,6 +5,7 @@ import express from 'express'
 const router = express.Router();
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
+
 /**
  * Search for tracks by name, optionally using fuzzy matching.
  * Query parameters:

@@ -1,7 +1,10 @@
 import axios from 'axios';
 import express from 'express'
 import { Playlist} from '../../db/mocks.js';
+import { verifyUser } from '../middleware/authorization.js';
 const router = express.Router();
+router.use(verifyUser);
+
 /**
  * Get all playlists for the authenticated user.
  * Requires Authentication header with user ID.
@@ -28,18 +31,20 @@ router.get('/', (req, res) => {
  */
 router.post('/', async (req, res) => {
     try {
-        const { title } = req.body;
-        // Validate required title field
-        if (!title) {
-            return res.status(400).json({ error: 'Playlist title is required.' });
-        }
-        // Accept Authentication header case-insensitively
+        // Check for Authentication header
         const userID = req.get('Authentication') || req.headers['authentication'];
         if (!userID) {
             return res.status(403).json({ error: 'Forbidden: Missing Authentication header' });
         }
         // Validate and parse user ID from header
         const parsedUserID = parseInt(String(userID).trim(), 10);
+        // Validate required title field
+        const { title } = req.body;
+        if (!title) {
+            return res.status(400).json({ error: 'Playlist title is required.' });
+        }
+        
+        
         // if (Number.isNaN(parsedUserID)) {
         //     return res.status(400).json({ error: 'Invalid Authentication header value' });
         // }

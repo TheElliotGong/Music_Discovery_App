@@ -20,25 +20,15 @@ const playlistSchema = new mongoose.Schema({
     type: [trackSchema],
     default: []
   },
+  // Reference to the User who owns this playlist
   user_id: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    
+    required: true
   },
 
 });
 
-playlistSchema.statics.authenticate = async (title, callback) => {
-  try {
-    const doc = await PlaylistModel.findOne({ title }).exec();
-    if (!doc) {
-      return callback();
-    }
-    return callback(null, doc);
-  } catch (err) {
-    return callback(err);
-  }
-};
 
 const Playlist = mongoose.model('Playlist', playlistSchema);
 export default Playlist;
