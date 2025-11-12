@@ -25,8 +25,8 @@ const userSchema = new mongoose.Schema({
   },
 
   registrationDate: {
-    type: Date,
-    default: Date.now,
+    type: Number,
+    default: Date.now(),
   },
 });
 //Enable virtual field for user's playlists

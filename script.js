@@ -2,7 +2,7 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import User from './api/controllers/models/users.js';
 import Playlist from './api/controllers/models/playlists.js';
-
+// load environment variables
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_URL = process.env.DB_URL;
@@ -28,7 +28,7 @@ const connect = async () => {
 
 /**
  * runScript
- * sample script to demonstrate creating users, libraries & populating relationships
+ * sample script to demonstrate creating users, playlists & populating relationships
  */
 const runScript = async () => {
     try {
@@ -39,14 +39,15 @@ const runScript = async () => {
 
         // step 2: create a user
         const newUser = new User({
-            username: 'bro',
-            password: 'mypassword'
+            username: 'captain',
+            password: 'america'
         });
         await newUser.save();
         // console.log('User created:', newUser);
         // step 3: create a playlist and attach it to the user created in #2
         const newPlaylist = new Playlist({
-            title: 'My Favorite Songs',
+            title: 'Avengers Mix',
+            tracks: [{ mbid: 'track1', track: 'Track 1', artist: 'Artist 1', album: 'First album', image: 'url' }],
             user_id: newUser._id
         });
         await newPlaylist.save();
@@ -54,7 +55,7 @@ const runScript = async () => {
 
         // step 4: Use the correct model to query the user (from #2) by their _id and get their associated playlists by using populate
         //Print out the query response to verify the relationship is populated correctly
-        const populatedUser = await User.findById(newUser._id).populate('playlists');
+        const populatedUser = await User.findById({ _id: newUser._id }).populate('playlists');
         console.log('User with populated playlists:', populatedUser);
 
        // close the db connection

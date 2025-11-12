@@ -6,6 +6,9 @@ const router = express.Router();
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
 
+const _plusjoin = (str) => {
+    return str.split(' ').join('+');
+};
 /**
  * Search for tracks by name, optionally using fuzzy matching.
  * Query parameters:
@@ -23,10 +26,14 @@ router.get('/search', async (req, res) => {
             return res.status(500).json({ error: 'Server missing Last.fm API key' });
         }
         // Construct Last.fm API request parameters and perform request
+        
+        const formatted = _plusjoin(track);
+        const search = fuzzy === 'true' ? `${formatted}*` : formatted;
+
         const params = {
             method: 'track.search',
             api_key: LASTFM_API_KEY,
-            track,
+            track: search,
             format: 'json'
         };
         const { data } = await axios.get(LASTFM_API_URL, { params });
@@ -70,7 +77,7 @@ router.get('/search', async (req, res) => {
         if (fuzzy === 'true') {
             const fuse = new Fuse(results, {
                 keys: ['track', 'artist'],
-                threshold: 0.3, // smaller = stricter match; larger = fuzzier
+                threshold: 0.8, // smaller = stricter match; larger = fuzzier
             });
 
             results = fuse.search(track).map(r => r.item);
