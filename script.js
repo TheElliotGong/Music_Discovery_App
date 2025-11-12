@@ -56,11 +56,11 @@ const runScript = async () => {
         // step 4: Use the correct model to query the user (from #2) by their _id and get their associated playlists by using populate
         //Print out the query response to verify the relationship is populated correctly
         const populatedUser = await User.findById({ _id: newUser._id }).populate('playlists');
-        console.log('User with populated playlists:', populatedUser);
+        console.log('User with populated playlists:', JSON.stringify(populatedUser.toJSON(), null, 2));
 
        // close the db connection
         mongoose.connection.close();
-    } catch (error) {s
+    } catch (error) {
         console.error(error);
         process.exit(1);
     }
