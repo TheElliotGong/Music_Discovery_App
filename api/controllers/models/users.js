@@ -28,23 +28,26 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: Date.now(),
   },
-},{
+}, 
+//Schema options
+{
   timestamps: true,
-  toJSON: {virtuals: true,
+  toJSON: {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
       delete ret.password;
       return ret;
     },
-    toObject:{
+    toObject: {
       virtuals: true,
-  transform: (doc, ret) => {
-    delete ret.password;
-    return ret;
-  }
+      transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+      }
     }
-}});
+  }
+});
 //Enable virtual field for user's playlists
 userSchema.virtual('playlists', {
   ref: 'Playlist', // The model to use

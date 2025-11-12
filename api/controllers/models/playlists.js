@@ -34,7 +34,7 @@ const playlistSchema = new mongoose.Schema({
     versionKey: false,
     transform: (doc, ret) => {
       ret.id = ret._id?.toString();
-      delete ret._id;
+      // delete ret._id;
       return ret;
     }
   },
@@ -42,7 +42,7 @@ const playlistSchema = new mongoose.Schema({
     virtuals: true,
     transform: (doc, ret) => {
       ret.id = ret._id?.toString();
-      delete ret._id;
+      // delete ret._id;
       return ret;
     }
   }
