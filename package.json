@@ -2,10 +2,10 @@
   "name": "music-discovery-app",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "npx nodemon script.js"
+    "dev": "npx nodemon app.js"
   },
   "keywords": [],
   "author": "Elliot Gong",

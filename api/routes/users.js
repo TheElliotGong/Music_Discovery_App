@@ -1,5 +1,5 @@
 import express from 'express'
-import { User } from '../../db/mocks.js';
+import User from '../controllers/models/users.js';
 import { hash, compare, sign} from '../util/auth.js';
 import {verifyUser} from '../middleware/authorization.js';
 
@@ -30,8 +30,8 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'Username cannot be empty or whitespace only' });
         }
         // Check if username already exists
-        const user = User.find('username', caseInsensitiveUsername);
-        if (user) {
+        const existingUser = await User.exists({ username: caseInsensitiveUsername });
+        if (existingUser) {
             return res.status(400).json({ error: 'Username already exists' });
         }
 
@@ -42,15 +42,15 @@ router.post('/register', async (req, res) => {
         if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
             return res.status(400).json({ error: 'Password must include letters and numbers' });
         }
-        //Add the new user to the mock database
+        //Add the new user to the mongodb database
         const data = {
             username: caseInsensitiveUsername,
             password: await hash(password),
-            registrationDate: Date.now()
         }
-        const registeredUser = User.add(data);
-        // console.log(User.users);
-        return res.status(201).json(sanitize(registeredUser));
+        const newUser = new User(data);
+        await newUser.save();
+
+        return res.status(201).json(sanitize(newUser));
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to register user' });
@@ -70,27 +70,23 @@ router.post('/login', async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({ error: 'Username and password required to login.' });
         }
-        // Find user by username (case-insensitive and trimmed)
+        //Ensure user exists and password matches
         const normalized = username.toLowerCase().trim();
-        // Validate user exists and password matches
-        const user = User.find('username', normalized);
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid username or password' });
-        }
-        const passwordMatches = await compare(password, user.password);
-        if (!passwordMatches) {
+        const user = await User.findOne({ username: normalized });
+        const isValid = user && (await compare(password, user.password));
+
+        if (!isValid) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
 
         // TODO Homework 2: set authorization header with JWT
         const token = sign({ username: user.username, id: user._id });
-        res.json({
+        return res.status(200).json({
             access_token: token,
             token_type: 'Bearer',
             user: sanitize(user)
         })
-        return res.status(200).json(sanitize(user));
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to login user' });
