@@ -3,57 +3,45 @@ import 'dotenv/config';
 import playlists from './api/routes/playlists.js';
 import tracks from './api/routes/tracks.js';
 import users from './api/routes/users.js';
-import mongoose from 'mongoose';
-import User from './api/controllers/models/users.js';
-import Playlist from './api/controllers/models/playlists.js';
+import { connect, disconnect } from './db/connection.js';
 
-const DB_USER = process.env.DB_USER;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const DB_URL = process.env.DB_URL;
-const DB_NAME = process.env.DB_NAME;
 const port = 3000;
 const app = express();
 
-const connect = async () => {
-    try {
-        const MONGO_URI = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_URL}/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
-
-        await mongoose.connect(MONGO_URI);
-        console.log('connected to mongoDB');
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-    }
-};
-
-const runScript = async () => {
-    try {
-        await connect();
-        const newUser = new User({
-            username: 'newuser',
-          
-            password: 'password123'
-        });
-        await newUser.save();
-        console.log('User created:', newUser);
-        
-        
-    }catch(err)
-    {
-        console.error('Error running script:', err);
-    }
-}
-
-runScript();
-// Parse JSON and URL-encoded bodies
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/playlists', playlists);
 app.use('/tracks', tracks);
 app.use('/users', users);
+const start = async () => {
+    try {
+        // establish database connection first
+        await connect();
+
+        // start express server after successful db connection
+        app.listen(PORT, () => {
+            console.log(`server is running on localhost:${PORT}`);
+        });
+    } catch (error) {
+        // log error and exit if server fails to start
+        console.error('failed to start server:', error.message);
+        process.exit(1);
+    }
+};
+// graceful shutdown handler
+const shutdown = async () => {
+    console.log('\nshutting downy...');
+    // close database connection before exiting
+    await disconnect();
+    process.exit(0);
+};
+
+// listen for the SIGTERM signal - common sources of SIGTERM include Docker stopping a container
+process.on('SIGTERM', shutdown);
+// listen for the SIGINT signal (sent when user presses Ctrl+C in the terminal)
+process.on('SIGINT', shutdown);
+
+start();
 
 
-app.listen(port, () => {
-    console.log(`Server started on ${port}`);
-})

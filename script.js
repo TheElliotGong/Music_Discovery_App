@@ -62,7 +62,7 @@ const runScript = async () => {
         mongoose.connection.close();
     } catch (error) {
         console.error(error);
-        process.exit(1);
+        // process.exit(1);
     }
 };
 

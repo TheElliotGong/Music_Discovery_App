@@ -1,6 +1,6 @@
 import axios from 'axios';
 import express from 'express'
-import { Playlist} from '../../db/mocks.js';
+import  Playlist from '../models/Playlist.js';
 import { verifyUser } from '../middleware/authorization.js';
 const router = express.Router();
 router.use(verifyUser);
