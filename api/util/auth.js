@@ -25,38 +25,38 @@ const compare = async (password, hashedPassword) => {
   return bcrypt.compare(password, hashedPassword);
 };
 /**
- * Sign a JWT token.
- * @param {*} payload The payload to include in the token.
- * @param {*} opts Options for signing the token.
- * @returns {Promise<string>} The signed JWT token.
+ * Signs a JWT with a given payload.
+ * @param {object} payload - The data to include in the token (e.g., { _id, username }).
+ * @returns {string} The signed JSON Web Token.
  */
-const sign = (payload, opts = {}) => {
-  if (!JWT_SECRET) throw new Error('Missing JWT_SECRET');
-  const options = { algorithm: 'HS256', expiresIn: '24h', ...opts };
-  return jwt.sign(payload, JWT_SECRET, options);
+const signToken = (payload) => {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
 };
 /**
- * Verify and decode a JWT token.
- * @param {*} token The JWT token to verify.
- * @returns {Promise<Object|null>} The decoded token payload or null if verification fails.
+ * Verifies a JWT.
+ * @param {string} token - The token to verify.
+ * @returns {object|null} The decoded payload if valid, otherwise null.
  */
-const verify = (token) => {
-  if (!JWT_SECRET) throw new Error('Missing JWT_SECRET');
-  // specify allowed algorithms explicitly
-  return jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
+const verifyToken = (token) => {
+    try {
+        return jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+        return null;
+    }
 };
+
 /**
  * Get the JWT token from the request headers.
  * @param {*} req The request object.
  * @returns {string|null} The JWT token or null if not found.
  */
-const getTokenFromHeader = (req) => {
-  const auth = req.headers.authorization || req.get('Authentication') || '';
-  if (!auth) return null;
-  // support: "Bearer <token>" or raw token in Authentication header
-  if (auth.startsWith('Bearer ')) return auth.slice(7).trim();
-  return auth.trim();
-};
+// const getTokenFromHeader = (req) => {
+//   const auth = req.headers.authorization || req.get('Authentication') || '';
+//   if (!auth) return null;
+//   // support: "Bearer <token>" or raw token in Authentication header
+//   if (auth.startsWith('Bearer ')) return auth.slice(7).trim();
+//   return auth.trim();
+// };
 /**
  * Middleware to authenticate requests using JWT.
  * @param {*} req The request object.
@@ -64,15 +64,15 @@ const getTokenFromHeader = (req) => {
  * @param {*} next The next middleware function.
  * @returns 
  */
-const authenticate = (req, res, next) => {
-  try {
-    const token = getTokenFromHeader(req);
-    if (!token) return res.status(401).json({ error: 'Missing token' });
-    const payload = auth.verify(token); // auth from import
-    req.user = payload;
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: err.message || 'Invalid token' });
-  }
-};
-export { hash, compare, sign, verify, getTokenFromHeader, authenticate };
+// const authenticate = (req, res, next) => {
+//   try {
+//     const token = getTokenFromHeader(req);
+//     if (!token) return res.status(401).json({ error: 'Missing token' });
+//     const payload = auth.verify(token); // auth from import
+//     req.user = payload;
+//     next();
+//   } catch (err) {
+//     return res.status(401).json({ error: err.message || 'Invalid token' });
+//   }
+// };
+export { hash, compare, signToken, verifyToken, };

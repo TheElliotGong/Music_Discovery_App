@@ -1,6 +1,6 @@
 import express from 'express'
 import User from '../models/User.js';
-import { hash, compare, sign} from '../util/auth.js';
+import { hash, compare, signToken} from '../util/auth.js';
 import {verifyUser} from '../middleware/authorization.js';
 
 const router = express.Router();
@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
 
 
         // TODO Homework 2: set authorization header with JWT
-        const token = sign({ username: user.username, id: user._id });
+        const token = signToken({ username: user.username, id: user._id });
         return res.status(200).json({
             access_token: token,
             token_type: 'Bearer',

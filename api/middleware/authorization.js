@@ -1,43 +1,36 @@
-import { verify } from '../util/auth.js';
+import { verifyToken } from '../util/auth.js';
 import User from '../models/User.js';
 const verifyUser = async (req, res, next) => {
-  try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: 'Unauthorized: Missing Authorization header' });
-    }
-    //Check the format of the Authorization header
-    const parts = authHeader.split(' ').filter(Boolean);
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return res.status(401).json({ error: 'Unauthorized: Invalid Authorization header format' });
-    }
-    // Extract the token from the Authorization header and verify it
-    const token = parts[1];
-    let decoded;
-    try {
-      decoded = verify(token); // expected payload: { id, username } OR { _id, username }
-    } catch {
-      return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
-    }
-    // Extract user ID from decoded token
-    const userId = decoded.id || decoded._id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized: Token missing user id' });
-    }
-    // Find the user in the database
-    const user = User.find('_id', userId);
-    if (!user) {
-      // Return 401 to avoid leaking which IDs exist
-      return res.status(401).json({ error: 'Unauthorized: Invalid credentials' });
-    }
+  const { authorization } = req.headers;
 
-    req.user = user;
-    return next();
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Failed to authorize user' });
-  }
+    try {
+        if (!authorization) {
+            return res.status(401).json({ error: 'Unauthorized: no token provided' });
+        }
+
+        const [token_type, token] = authorization.split(' ');
+
+        if (token_type !== 'Bearer' || !token) {
+            return res.status(401).json({ error: 'Unauthorized: invalid token format' });
+        }
+
+        const verified = verifyToken(token);
+        if (!verified) {
+            return res.status(401).json({ error: 'Unauthorized: token is invalid or expired' });
+        }
+        console.log(verified);
+        const user = await User.findById(verified.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        req.user = user;
+
+        // pass control to the next middleware or to route handler
+        next();
+    } catch (error) {
+        res.status(500).json({ error: error.toString() });
+    }
 };
 
 
