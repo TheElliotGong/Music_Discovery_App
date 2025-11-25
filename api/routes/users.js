@@ -4,10 +4,10 @@ import { hash, compare, sign} from '../util/auth.js';
 import {verifyUser} from '../middleware/authorization.js';
 
 const router = express.Router();
-router.use(verifyUser);
 //A helper function to remove the password field from user objects before sending them in responses
 const sanitize = (user) => {
-    const { password, ...rest } = user;
+    const userObj = user.toObject ? user.toObject() : user;
+    const { password, ...rest } = userObj;
     return rest;
 };
 /**
@@ -44,11 +44,8 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'Password must include letters and numbers' });
         }
         //Add the new user to the mongodb database
-        const data = {
-            username: caseInsensitiveUsername,
-            password: await hash(password),
-        }
-        const newUser = new User(data);
+        const hashedPassword = await hash(password);
+        const newUser = new User({password: hashedPassword, username: caseInsensitiveUsername});
         await newUser.save();
 
         return res.status(201).json(sanitize(newUser));
@@ -108,7 +105,7 @@ router.post('/login', async (req, res) => {
  * Requires 'Authentication' header with the user ID.
  * Validates that the requested ID matches the authenticated user ID.
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyUser, async (req, res) => {
     try {
         const { id } = req.params;
         // Read the 'Authentication' header in a case-insensitive way

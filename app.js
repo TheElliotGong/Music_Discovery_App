@@ -20,8 +20,8 @@ const start = async () => {
         await connect();
 
         // start express server after successful db connection
-        app.listen(PORT, () => {
-            console.log(`server is running on localhost:${PORT}`);
+        app.listen(port, () => {
+            console.log(`server is running on localhost:${port}`);
         });
     } catch (error) {
         // log error and exit if server fails to start

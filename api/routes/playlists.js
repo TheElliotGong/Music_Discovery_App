@@ -1,4 +1,3 @@
-import axios from 'axios';
 import express from 'express'
 import  Playlist from '../models/Playlist.js';
 import { verifyUser } from '../middleware/authorization.js';
@@ -64,8 +63,8 @@ router.post('/', async (req, res) => {
             user_id: parsedUserID,
             tracks: []
         };
-        const addedPlaylist = Playlist.insert(data);
-        return res.status(201).json(addedPlaylist);
+        const newPlaylist = await Playlist.create(data);
+        return res.status(201).json(newPlaylist);
 
     } catch (err) {
         console.error(err);
