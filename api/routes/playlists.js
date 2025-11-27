@@ -117,46 +117,35 @@ router.put('/:_id', async (req, res) => {
  * Validates that the user owns the playlist before deleting.
  */
 router.delete('/:_id', async (req, res) => {
-    try {
-        // Accept Authentication header case-insensitively
-        const userID = req.get('Authentication') || req.headers['authentication'] || req.headers.authorization;
-        if (!userID) {
-            return res.status(403).json({ error: 'Forbidden: Missing Authentication header' });
-        }
-        // Validate and parse user ID from header
-        const parsedUserID = parseInt(String(userID).trim(), 10);
-        if (Number.isNaN(parsedUserID)) {
-            return res.status(400).json({ error: 'Invalid Authentication header value' });
+try {
+        // User context provided by verifyUser middleware
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: user context missing' });
         }
 
-        // Validate playlist id param
-        const _idParam = req.params._id;
-        const playlistID = parseInt(String(_idParam).trim(), 10);
-        if (Number.isNaN(playlistID)) {
+        // Validate playlist id
+        const playlistID = req.params._id;
+        if (!mongoose.Types.ObjectId.isValid(playlistID)) {
             return res.status(400).json({ error: 'Invalid playlist id' });
         }
-        // Ensure user exists
-        // const user = User.find('_id', parsedUserID);
-        // if (!user) {
-        //     return res.status(404).json({ error: 'The user could not be found.' });
-        // }
-        //Ensure playlist exists
-        const playlist = Playlist.find('_id', playlistID);
+
+        // Find playlist
+        const playlist = await Playlist.findById(playlistID);
         if (!playlist) {
-            return res.status(404).json({ error: 'The playlist could not be found.' });
+            return res.status(404).json({ error: 'Playlist not found' });
         }
 
-        // Ensure the authenticated user owns this playlist
-        if (playlist.user_id !== parsedUserID) {
+        // Ownership check
+        if (!playlist.user_id.equals(userId)) {
             return res.status(403).json({ error: 'Forbidden: You do not own this playlist' });
         }
-        const result = Playlist.delete(playlistID);
-        return res.status(200).json({ message: 'Playlist deleted successfully.', _id: result._id });
 
-    }
-    catch (err) {
+        await Playlist.findByIdAndDelete(playlistID);
+        return res.status(200).json({ message: 'Playlist deleted successfully.', _id: playlist._id });
+    } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to delete playlist.' });
+        return res.status(500).json({ error: 'Failed to delete playlist.' });
     }
 
 });
