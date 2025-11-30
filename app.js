@@ -1,8 +1,8 @@
 import express from 'express';
 import 'dotenv/config';
-import playlists from './api/routes/playlists.js';
+import playlists from './api/routes/playlist.js';
 import tracks from './api/routes/tracks.js';
-import users from './api/routes/users.js';
+import users from './api/routes/user.js';
 import { connect, disconnect } from './db/connection.js';
 
 const port = 3000;

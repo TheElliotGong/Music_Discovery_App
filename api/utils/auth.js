@@ -30,7 +30,7 @@ const compare = async (password, hashedPassword) => {
  * @returns {string} The signed JSON Web Token.
  */
 const signToken = (payload) => {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
 };
 /**
  * Verifies a JWT.

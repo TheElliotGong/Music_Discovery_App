@@ -1,6 +1,6 @@
 import express from 'express'
 import User from '../models/User.js';
-import { hash, compare, signToken} from '../util/auth.js';
+import { hash, compare, signToken} from '../utils/auth.js';
 import {verifyUser} from '../middleware/authorization.js';
 
 const router = express.Router();
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
         const normalized = username.toLowerCase().trim();
         const user = await User.findOne({ username: normalized });
         const isValid = user && (await compare(password, user.password));
-
+        //Handle invalid credentials
         if (!isValid) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
@@ -90,16 +90,7 @@ router.post('/login', async (req, res) => {
         return res.status(500).json({ error: 'Failed to login user' });
     }
 });
-// router.post('/logout', async (req, res) => {
-//   try
-//   {
 
-//   }
-//   catch(err)
-//   {
-
-//   }
-// });
 /**
  * Get user details by ID.
  * Requires 'Authentication' header with the user ID.
@@ -107,32 +98,17 @@ router.post('/login', async (req, res) => {
  */
 router.get('/:id', verifyUser, async (req, res) => {
     try {
-        const { id } = req.params;
-        // Read the 'Authentication' header in a case-insensitive way
-        // const authentication = req.get('Authentication') || req.headers['authentication'];
-        // // Validate presence of Authentication header
-        // if (!authentication) {
-        //     return res.status(403).json({ error: 'Forbidden: Missing Authentication header' });
-        // }
+    const { id } = req.params;
 
-        // // Compare header value to requested id (string compare after trimming)
-        // if (String(authentication).trim() !== String(id).trim()) {
-        //     return res.status(403).json({ error: 'Forbidden: You are not authorized to view this user' });
-        // }
-        // Validate id is a number
-        if (isNaN(id)) {
-            return res.status(400).json({ error: 'Invalid user ID' });
+     if (req.user._id.toString() !== id) {
+            return res.status(403).json({ error: 'Forbidden: You are not authorized to view this user.' });
         }
-        // Find user by id
-        // const user = User.find('_id', parseInt(id, 10));
-        // if (!user) {
-        //     return res.status(404).json({ error: 'User not found' });
-        // }
 
-        return res.status(200).json(sanitize(user));
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Failed to get user' });
-    }
+    // Return the authenticated user (sanitized)
+    return res.status(200).json(sanitize(req.user));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Failed to get user' });
+  }
 });
 export default router;

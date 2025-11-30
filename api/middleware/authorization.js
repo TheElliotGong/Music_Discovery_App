@@ -1,4 +1,4 @@
-import { verifyToken } from '../util/auth.js';
+import { verifyToken } from '../utils/auth.js';
 import User from '../models/User.js';
 const verifyUser = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -18,7 +18,7 @@ const verifyUser = async (req, res, next) => {
         if (!verified) {
             return res.status(401).json({ error: 'Unauthorized: token is invalid or expired' });
         }
-        console.log(verified);
+        // console.log(verified);
         const user = await User.findById(verified.id);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
