@@ -27,4 +27,4 @@ const sendPost = async (url, data, handler) => {
   }
 };
 
-module.exports
+export { sendPost };
