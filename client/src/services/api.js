@@ -64,12 +64,14 @@ const api = {
     return handleResponse(response);
   },
 
-  removeTrackFromPlaylist: async (token, playlistId, trackId) => {
-    const response = await fetch(`/playlists/${playlistId}/tracks/${trackId}`, {
+  removeTrackFromPlaylist: async (token, playlistId, mbid) => {
+    const response = await fetch(`/playlists/track/${playlistId}`, {
       method: 'DELETE',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
+      body: JSON.stringify({ mbid }),
     });
     return handleResponse(response);
   },

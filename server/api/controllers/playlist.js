@@ -63,6 +63,46 @@ router.post('/', async (req, res) => {
     }
 
 })
+
+router.put('/rename/:_id', async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: user context missing' });
+        }   
+        const playlistID = req.params._id;
+        if (!mongoose.Types.ObjectId.isValid(playlistID)) {
+            return res.status(400).json({ error: 'Invalid playlist id' });
+        }
+        const { newTitle } = req.body;
+        if (!newTitle || !String(newTitle).trim()) {
+            return res.status(400).json({ error: 'New playlist title is required.' });
+        }
+        const trimmedTitle = String(newTitle).trim();
+        const playlist = await Playlist.findById(playlistID);
+        if (!playlist) {
+            return res.status(404).json({ error: 'Playlist not found' });
+        }
+        if (!playlist.user_id.equals(userId)) {
+            return res.status(403).json({ error: 'Forbidden: You do not own this playlist' });
+        }
+        // Ensure no duplicate title for this user (case-insensitive)
+        const existing = await Playlist.findOne({
+            user_id: userId,
+            title: { $regex: `^${trimmedTitle}$`, $options: 'i' },
+            _id: { $ne: playlistID } // exclude current playlist
+        });
+        if (existing) {
+            return res.status(409).json({ error: 'A playlist with this title already exists for the user.' });
+        }
+        playlist.title = trimmedTitle;
+        await playlist.save();
+        return res.status(200).json(playlist.toJSON());
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to rename playlist.' });
+    }
+});
 /**
  * Add a track to a playlist by playlist ID.
  * Requires Authentication header with user ID.
@@ -118,7 +158,7 @@ router.put('/:_id', async (req, res) => {
  * Validates that the user owns the playlist before removing.
  * Expects mbid in the request body to identify the track.
  */
-router.delete('/:_id/tracks', async (req, res) => {
+router.delete('/track/:_id', async (req, res) => {
     try {
         // User already verified by middleware; use req.user
         const userId = req.user?._id;
@@ -151,7 +191,7 @@ router.delete('/:_id/tracks', async (req, res) => {
         if (trackIndex === -1) {
             return res.status(404).json({ error: 'Track with this mbid not found in playlist' });
         }
-
+        // Remove track and
         playlist.tracks.splice(trackIndex, 1);
         await playlist.save();
         return res.status(200).json(playlist.toJSON());

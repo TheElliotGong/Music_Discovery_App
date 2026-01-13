@@ -68,14 +68,14 @@ function Dashboard() {
     }
   };
 
-  const handleRemoveTrack = async (trackId) => {
+  const handleRemoveTrack = async (mbid) => {
     if (!selectedPlaylist) return;
 
     try {
       const updated = await api.removeTrackFromPlaylist(
         token,
         selectedPlaylist._id,
-        trackId
+        mbid
       );
       setPlaylists(playlists.map((p) => (p._id === updated._id ? updated : p)));
       setSelectedPlaylist(updated);

@@ -2,6 +2,8 @@ import React from 'react';
 import './PlaylistView.css';
 
 function PlaylistView({ playlist, onRemoveTrack, onAddTrack }) {
+
+
   return (
     <div className="playlist-view">
       <div className="playlist-view-header">
@@ -21,22 +23,22 @@ function PlaylistView({ playlist, onRemoveTrack, onAddTrack }) {
           {playlist.tracks.map((track) => (
             <div key={track._id} className="track-item">
               {track.image && (
-                <img
-                  src={track.image}
-                  alt={track.track}
-                  className="track-image"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              )}
+                  <a href={track.url} target="_blank" rel="noopener noreferrer"><img
+                    src={track.image}
+                    alt={track.name}
+                    className="result-image"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  /></a>
+                )}
               <div className="track-info">
-                <div className="track-name">{track.track}</div>
+                <div className="track-name">{track.name}</div>
                 <div className="track-artist">{track.artist}</div>
                 {track.album && <div className="track-album">{track.album}</div>}
               </div>
               <button
-                onClick={() => onRemoveTrack(track._id)}
+                onClick={() => onRemoveTrack(track.mbid)}
                 className="btn-remove-track"
                 title="Remove track"
               >
