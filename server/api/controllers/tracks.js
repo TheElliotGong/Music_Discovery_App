@@ -52,17 +52,35 @@ router.get('/search', async (req, res) => {
         // Extract track matches, ensuring it's always an array
         const rawTracks = data?.results?.trackmatches?.track || [];
         const trackList = Array.isArray(rawTracks) ? rawTracks : [rawTracks];
-
+        // console.log(trackList);
         // sanitize results to minimal shape expected by the README / app
         const sanitize = (t) => {
-            // Last.fm returns images as array of objects with '#text' and 'size'
-            const imageObj = Array.isArray(t.image) ? t.image.find(i => i['#text']) : null;
-            const imageUrl = imageObj ? imageObj['#text'] : '';
+            // Last.fm returns images as array of objects with '#text' (url) and 'size' properties
+            let imageUrl = '';
+            
+            if (Array.isArray(t.image) && t.image.length > 0) {
+                // Prefer higher quality images: extralarge > large > medium > small
+                const preferredSizes = ['extralarge', 'large', 'medium', 'small'];
+                
+                for (const size of preferredSizes) {
+                    const imageObj = t.image.find(img => img.size === size && img['#text']);
+                    if (imageObj) {
+                        imageUrl = imageObj['#text'];
+                        break;
+                    }
+                }
+                
+                // Fallback: take any image with a URL if preferred sizes not found
+                if (!imageUrl) {
+                    const anyImageObj = t.image.find(img => img['#text']);
+                    imageUrl = anyImageObj ? anyImageObj['#text'] : 'N/A';
+                }
+            }
 
             return {
-                track: t.name || t.title || '',
+                name: t.name || t.title || 'N/A',
                 artist: (t.artist && (typeof t.artist === 'string' ? t.artist : t.artist.name)) || '',
-                album: t.album || '',
+                url: t.url || 'N/A',
                 mbid: t.mbid || null,
                 image: imageUrl
             };
@@ -82,7 +100,7 @@ router.get('/search', async (req, res) => {
 
             results = fuse.search(track).map(r => r.item);
         }
-
+        console.log(results);
         return res.status(200).json(results);
 
     } catch (err) {
@@ -91,6 +109,8 @@ router.get('/search', async (req, res) => {
     }
 
 });
+
+
 /**
  * Get detailed track info by MusicBrainz ID (mbid).
  * Path parameter:

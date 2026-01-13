@@ -5,7 +5,10 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "npx nodemon ./server/app.js"
+    "dev": "npx nodemon ./server/app.js",
+    "client": "vite",
+    "build": "vite build",
+    "start": "node ./server/app.js"
   },
   "keywords": [],
   "author": "Elliot Gong",
@@ -25,6 +28,8 @@
     "react-player": "^3.4.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@vitejs/plugin-react": "^5.1.2",
+    "nodemon": "^3.1.10",
+    "vite": "^7.3.1"
   }
 }

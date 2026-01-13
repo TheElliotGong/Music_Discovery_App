@@ -1,0 +1,167 @@
+.playlist-list {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.playlist-header h2 {
+  color: #333;
+  font-size: 22px;
+  margin: 0;
+}
+
+.btn-create {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-create:hover {
+  transform: scale(1.1) rotate(90deg);
+}
+
+.create-form {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.create-form input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e1e1e1;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-save,
+.btn-cancel {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-save {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #45a049;
+}
+
+.btn-cancel {
+  background: #e1e1e1;
+  color: #666;
+}
+
+.btn-cancel:hover {
+  background: #d5d5d5;
+}
+
+.error-text {
+  color: #f44336;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.loading,
+.empty-playlists {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+}
+
+.empty-playlists p:first-child {
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.playlists {
+  list-style: none;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f9f9f9;
+}
+
+.playlist-item:hover {
+  background: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.playlist-item.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.playlist-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playlist-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.track-count {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.playlist-item.active .track-count {
+  opacity: 0.9;
+}
+
+.btn-delete {
+  background: transparent;
+  padding: 5px 10px;
+  font-size: 18px;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.playlist-item.active .btn-delete {
+  color: white;
+}

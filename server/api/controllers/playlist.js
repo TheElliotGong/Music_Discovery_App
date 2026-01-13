@@ -92,9 +92,9 @@ router.put('/:_id', async (req, res) => {
             return res.status(403).json({ error: 'Forbidden: You do not own this playlist' });
         }
         // Validate required track fields in body
-        const { track, artist, mbid, album = '', image = '' } = req.body;
-        if (!track || !artist || !mbid) {
-            return res.status(400).json({ error: 'Missing required track fields: track, artist, mbid' });
+        const { name, artist, mbid, url = '', image = '' } = req.body;
+        if (!name || !artist || !mbid) {
+            return res.status(400).json({ error: 'Missing required track fields: name, artist, mbid' });
         }
 
         // Prevent duplicate mbid
@@ -103,7 +103,7 @@ router.put('/:_id', async (req, res) => {
             return res.status(409).json({ error: 'Track with this mbid already in playlist' });
         }
 
-        playlist.tracks.push({ track, artist, album, mbid, image });
+        playlist.tracks.push({ name, artist, url, mbid, image });
         await playlist.save();
         return res.status(200).json(playlist.toJSON());
     } catch (err) {
@@ -111,6 +111,57 @@ router.put('/:_id', async (req, res) => {
         return res.status(500).json({ error: 'Failed to update playlist.' });
     }
 });
+
+/**
+ * Remove a track from a playlist by playlist ID and track mbid.
+ * Requires Authentication header with user ID.
+ * Validates that the user owns the playlist before removing.
+ * Expects mbid in the request body to identify the track.
+ */
+router.delete('/:_id/tracks', async (req, res) => {
+    try {
+        // User already verified by middleware; use req.user
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: user context missing' });
+        }
+        // Validate playlist id param
+        const playlistID = req.params._id;
+        if (!mongoose.Types.ObjectId.isValid(playlistID)) {
+            return res.status(400).json({ error: 'Invalid playlist id' });
+        }
+        // Ensure playlist exists
+        const playlist = await Playlist.findById(playlistID);
+        if (!playlist) {
+            return res.status(404).json({ error: 'Playlist not found' });
+        }
+
+        // Ownership check
+        if (!playlist.user_id.equals(userId)) {
+            return res.status(403).json({ error: 'Forbidden: You do not own this playlist' });
+        }
+        // Validate required mbid field in body
+        const { mbid } = req.body;
+        if (!mbid) {
+            return res.status(400).json({ error: 'Missing required field: mbid' });
+        }
+
+        // Find track with matching mbid
+        const trackIndex = playlist.tracks.findIndex(t => t.mbid === mbid);
+        if (trackIndex === -1) {
+            return res.status(404).json({ error: 'Track with this mbid not found in playlist' });
+        }
+
+        playlist.tracks.splice(trackIndex, 1);
+        await playlist.save();
+        return res.status(200).json(playlist.toJSON());
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to remove track from playlist.' });
+    }
+});
+
+
 /**
  * Delete a playlist by ID.
  * Requires Authentication header with user ID.
