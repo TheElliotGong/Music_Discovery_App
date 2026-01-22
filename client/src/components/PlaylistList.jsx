@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './PlaylistList.css';
 
-function PlaylistList({ playlists, selectedPlaylist, onSelect, onCreate, onDelete, loading }) {
+function PlaylistList({ playlists, selectedPlaylist, onSelect, onCreate, onRename, onDelete, loading }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [creating, setCreating] = useState(false);
@@ -87,18 +87,38 @@ function PlaylistList({ playlists, selectedPlaylist, onSelect, onCreate, onDelet
                 <span className="playlist-title">{playlist.title}</span>
                 <span className="track-count">{playlist.tracks.length} tracks</span>
               </div>
-              <button
-                className="btn-delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (window.confirm(`Delete "${playlist.title}"?`)) {
-                    onDelete(playlist._id);
-                  }
-                }}
-                title="Delete playlist"
-              >
-                🗑️
-              </button>
+              <div className="playlist-actions">
+                <button
+                  className="btn-rename"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    const proposed = window.prompt('Rename playlist', playlist.title);
+                    if (!proposed) return;
+                    const trimmed = proposed.trim();
+                    if (!trimmed || trimmed === playlist.title) return;
+                    try {
+                      await onRename(playlist._id, trimmed);
+                    } catch (err) {
+                      setError(err.message);
+                    }
+                  }}
+                  title="Rename playlist"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="btn-delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(`Delete "${playlist.title}"?`)) {
+                      onDelete(playlist._id);
+                    }
+                  }}
+                  title="Delete playlist"
+                >
+                  🗑️
+                </button>
+              </div>
             </li>
           ))}
         </ul>

@@ -149,19 +149,28 @@
   opacity: 0.9;
 }
 
+.playlist-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-rename,
 .btn-delete {
   background: transparent;
-  padding: 5px 10px;
-  font-size: 18px;
+  padding: 5px 8px;
+  font-size: 16px;
   opacity: 0.6;
   transition: all 0.2s;
 }
 
+.btn-rename:hover,
 .btn-delete:hover {
   opacity: 1;
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
 
+.playlist-item.active .btn-rename,
 .playlist-item.active .btn-delete {
   color: white;
 }

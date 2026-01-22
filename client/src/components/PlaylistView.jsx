@@ -42,7 +42,7 @@ function PlaylistView({ playlist, onRemoveTrack, onAddTrack }) {
                 className="btn-remove-track"
                 title="Remove track"
               >
-                ×
+                x
               </button>
             </div>
           ))}

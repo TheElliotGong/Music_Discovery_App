@@ -54,6 +54,45 @@ router.post('/register', async (req, res) => {
         return res.status(500).json({ error: 'Failed to register user' });
     }
 });
+router.put('/edit/:id', verifyUser, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { username, password } = req.body;
+        // Only allow users to edit their own profile
+        if (req.user._id.toString() !== id) {
+            return res.status(403).json({ error: 'Forbidden: You are not authorized to edit this user.' });
+        }
+        const updates = {};
+        if (username) {
+            const trimmedUsername = String(username).toLowerCase().trim();
+            if (trimmedUsername.length === 0) {
+                return res.status(400).json({ error: 'Username cannot be empty or whitespace only' });
+            }
+            // Check for username uniqueness
+            const existingUser = await
+
+                User.findOne({ username: trimmedUsername, _id: { $ne: id } });
+            if (existingUser) {
+                return res.status(400).json({ error: 'Username already exists' });
+            }
+            updates.username = trimmedUsername;
+        }
+        if (password) {
+            if (password.length < 8) {
+                return res.status(400).json({ error: 'Password must be at least 8 characters' });
+            }
+            if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+                return res.status(400).json({ error: 'Password must include letters and numbers' });
+            }
+            updates.password = await hash(password);
+        }
+        const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+        return res.status(200).json(sanitize(updatedUser));
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to update user' });
+    }
+});
 /**
  * Login a user.
  * Expects 'username' and 'password' in the request body.

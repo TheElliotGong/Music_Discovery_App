@@ -49,12 +49,23 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
   };
 
+  const updateProfile = async (updates) => {
+    if (!user || !token) {
+      throw new Error('Not authenticated');
+    }
+    const updatedUser = await api.editProfile(token, user._id, updates);
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return updatedUser;
+  };
+
   const value = {
     user,
     token,
     login,
     register,
     logout,
+    updateProfile,
     loading,
   };
 

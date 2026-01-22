@@ -20,6 +20,18 @@ const api = {
     return handleResponse(response);
   },
 
+  editProfile: async (token, userId, updates) => {
+    const response = await fetch(`/users/edit/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(updates),
+    });
+    return handleResponse(response);
+  },
+
   // Playlists
   getPlaylists: async (token) => {
     const response = await fetch('/playlists', {
@@ -53,7 +65,17 @@ const api = {
     });
     return handleResponse(response);
   },
-
+  renamePlaylist: async (token, playlistId, newTitle) => {
+    const response = await fetch(`/playlists/rename/${playlistId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ newTitle }),
+    });
+    return handleResponse(response);
+  },
   deletePlaylist: async (token, playlistId) => {
     const response = await fetch(`/playlists/${playlistId}`, {
       method: 'DELETE',
