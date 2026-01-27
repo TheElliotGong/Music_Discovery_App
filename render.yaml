@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: music-discovery-app
+    runtime: node
+    region: oregon
+    plan: free
+    
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_URL
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: LASTFM_API_KEY
+        sync: false
