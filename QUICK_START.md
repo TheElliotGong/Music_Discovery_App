@@ -41,7 +41,7 @@ Navigate to `http://localhost:5173` in your browser
 
 ### Features
 ✅ User authentication with JWT
-✅ Create and delete playlists
+✅ Create, edit, and delete playlists
 ✅ Search tracks from Last.fm API
 ✅ Add tracks to playlists
 ✅ Remove tracks from playlists

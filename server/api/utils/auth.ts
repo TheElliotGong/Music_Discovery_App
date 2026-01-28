@@ -3,15 +3,14 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  // optional: throw here so missing secret is detected at startup
-  console.warn('Warning: JWT_SECRET is not set. Tokens will not be secure.');
+  throw new Error('JWT_SECRET is not set. Tokens cannot be signed or verified.');
 }
 /**
  * Hash a password.
  * @param {*} password The plain text password to hash.
  * @returns {Promise<string>} The hashed password.
  */
-const hash = async (password) => {
+const hash = async (password: string): Promise<string> => {
   const saltRounds = 10;
   return bcrypt.hash(password, saltRounds);
 };
@@ -21,7 +20,7 @@ const hash = async (password) => {
  * @param {*} hashedPassword The hashed password to compare against.
  * @returns {Promise<boolean>} True if the passwords match, false otherwise.
  */
-const compare = async (password, hashedPassword) => {
+const compare = async (password: string, hashedPassword: string): Promise<boolean> => {
   return bcrypt.compare(password, hashedPassword);
 };
 /**
@@ -29,20 +28,22 @@ const compare = async (password, hashedPassword) => {
  * @param {object} payload - The data to include in the token (e.g., { _id, username }).
  * @returns {string} The signed JSON Web Token.
  */
-const signToken = (payload) => {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
+type JwtPayload = Record<string, unknown>;
+
+const signToken = (payload: JwtPayload): string => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
 };
 /**
  * Verifies a JWT.
  * @param {string} token - The token to verify.
  * @returns {object|null} The decoded payload if valid, otherwise null.
  */
-const verifyToken = (token) => {
-    try {
-        return jwt.verify(token, JWT_SECRET);
-    } catch (error) {
-        return null;
-    }
+const verifyToken = (token: string): JwtPayload | null => {
+  try {
+    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+  } catch (_error) {
+    return null;
+  }
 };
 
 /**
@@ -75,4 +76,4 @@ const verifyToken = (token) => {
 //     return res.status(401).json({ error: err.message || 'Invalid token' });
 //   }
 // };
-export { hash, compare, signToken, verifyToken, };
+export { hash, compare, signToken, verifyToken };

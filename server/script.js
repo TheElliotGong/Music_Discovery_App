@@ -1,13 +1,28 @@
+/**
+ * ⚠️ NOTE: This file is NOT currently being used
+ * 
+ * This is a standalone script for testing Mongoose models and database operations.
+ * It is NOT executed by the active npm scripts (npm start, npm run dev).
+ * 
+ * To run this script manually:
+ *   npx ts-node server/script.ts
+ * 
+ * For active application logic, see server/app.ts instead.
+ */
+
 import 'dotenv/config';
 import mongoose from 'mongoose';
-import User from './api/controllers/models/users.js';
-import Playlist from './api/controllers/models/playlists.js';
+import User from './api/models/User.js';
+import Playlist from './api/models/Playlist.js';
 // load environment variables
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_URL = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
-
+/**
+ * Script file used to test and demonstrate mongoose relationships
+ * Not part of the main server application
+ */
 
 /**
  * connect to mongoDB
@@ -59,7 +74,7 @@ const runScript = async () => {
         console.log('User with populated playlists:', JSON.stringify(populatedUser, null, 2));
 
        // close the db connection
-        mongoose.connection.close();
+        await mongoose.connection.close();
     } catch (error) {
         console.error(error);
         // process.exit(1);
